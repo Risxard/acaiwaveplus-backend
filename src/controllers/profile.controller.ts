@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import  ProfileModel  from '../models/profileModel';
+import { ProfileModel } from '../models/profileModel';
 
 interface IError {
     code: number;

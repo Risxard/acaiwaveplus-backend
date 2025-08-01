@@ -1,6 +1,6 @@
 import { ProfileRepository } from "../repository/profileRepository";
 
-export default class ProfileModel {
+export class ProfileModel {
     uid: string;
     #repository: ProfileRepository;
     private repository = new ProfileRepository();

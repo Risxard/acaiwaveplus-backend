@@ -1,10 +1,9 @@
 import { Request, Response } from 'express'
-import  UserModel  from '../models/userModel'
+import { UserModel } from '../models/userModel'
 
 interface IUser {
     uid: string;
 }
-
 
 interface IError {
     code: number;
