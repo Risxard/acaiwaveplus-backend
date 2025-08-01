@@ -1,19 +1,11 @@
 version: '3.8'
 
 services:
-  acaiwaveplus-backend:
-    container_name: acaiwaveplus-backend
+  api:
     build: .
+    container_name: acaiwaveplus-api
     ports:
       - "7475:7475"
-    restart: always
     env_file:
       - .env
-    volumes:
-      - .:/app
-    networks:
-      - backend-net
-
-networks:
-  backend-net:
-    driver: bridge
+    restart: unless-stopped

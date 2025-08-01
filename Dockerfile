@@ -1,25 +1,15 @@
-# Etapa 1 - build
-FROM node:20 AS builder
+FROM node:18
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
+
 RUN npm install
 
-COPY tsconfig.json ./
-COPY src ./src
+COPY . .
+
 RUN npm run build
 
-# Etapa 2 - produção
-FROM node:20-slim
-
-WORKDIR /app
-
-COPY package*.json ./
-RUN npm install --only=production
-
-COPY --from=builder /app/dist ./dist
-COPY firebase-admin-sdk.json ./
-COPY .env ./
+EXPOSE 7475
 
 CMD ["node", "dist/server.js"]
