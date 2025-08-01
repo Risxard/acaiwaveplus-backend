@@ -1,6 +1,6 @@
 import { UserRepository } from "../repository/userRepository";
 
-export class UserModel {
+export default class UserModel {
     uid: string;
     #repository: any;
 
