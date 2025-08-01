@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { authenticateFirebase } from '../middlewares/auth';
-import { UserController } from '../controllers/user.controller';
-import { ProfileController } from '../controllers/profile.controller';
+import  UserController  from '../controllers/user.controller';
+import  ProfileController  from '../controllers/profile.controller';
 
 
 const router = Router()

@@ -6,7 +6,7 @@ interface IError {
     message: string;
 }
 
-export class ProfileController {
+export default class ProfileController {
     updateLanguage = async (req: Request, res: Response) => {
         const uid = (req as Request & { user: { uid: string } }).user.uid;
         const { profileId } = req.params;
