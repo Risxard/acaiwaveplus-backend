@@ -9,7 +9,7 @@ interface IError {
     code: number;
     message: string;
 }
-export class UserController {
+export default class UserController {
 
     findByUser = async (request: Request, response: Response) => {
         const uid = (request as Request & { user: { uid: string } }).user.uid;
