@@ -29,8 +29,11 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "dist/"
+          source: "."
           target: "/srv/acaiwaveplus-api"
+
+      - name: Build na VPS
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /srv/acaiwaveplus-api && npm ci && npm run build"
 
       - name: Restart container (opcional)
         run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd /srv/acaiwaveplus-api && docker-compose down && docker-compose up -d"
