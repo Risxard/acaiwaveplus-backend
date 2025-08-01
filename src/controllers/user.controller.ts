@@ -5,6 +5,7 @@ interface IUser {
     uid: string;
 }
 
+
 interface IError {
     code: number;
     message: string;
