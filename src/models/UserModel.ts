@@ -1,4 +1,5 @@
-import { UserRepository } from "../repository/userRepository";
+import { UserRepository } from "../repository/user.repository";
+
 
 export class UserModel {
     uid: string;

@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authenticateFirebase } from '../middlewares/auth';
+import { authenticateFirebase } from '../middlewares/authenticate.middleware';
 import UserController from '../controllers/user.controller';
 import ProfileController from '../controllers/profile.controller';
 
