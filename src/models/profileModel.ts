@@ -9,33 +9,6 @@ export class ProfileModel {
         this.#repository = new ProfileRepository();
     }
 
-    async updateProfileLanguage(profileId: string, language: string) {
-        if (!this.uid || !profileId || !language) {
-            return Promise.reject({
-                code: 400,
-                message: "Dados insuficientes para atualizar a linguagem do perfil",
-            });
-        }
-
-        const profiles = await this.#repository.getUserProfiles(this.uid);
-
-        const updatedProfiles = profiles.map((profile: any) => {
-            if (profile.id === profileId) {
-                return {
-                    ...profile,
-                    userInfoData: {
-                        ...profile.userInfoData,
-                        language,
-                    },
-                };
-            }
-            return profile;
-        });
-
-        await this.#repository.updateUserProfiles(this.uid, updatedProfiles);
-
-        return { message: "Linguagem do perfil atualizada com sucesso" };
-    }
 
     async updateWatchlist(uid: string, profileId: string, type: 'movie' | 'tv', itemId: number, action: 'add' | 'remove') {
         if (!uid || !profileId || !type || !itemId || !action) {
@@ -48,6 +21,24 @@ export class ProfileModel {
             watchlist: updatedWatchlist
         };
     }
+
+    async getWatchlist(uid: string, profileId: string) {
+        if (!uid) {
+            return Promise.reject({
+                code: 400,
+                message: 'UID não fornecido',
+            });
+        }
+        if (!profileId) {
+            return Promise.reject({
+                code: 400,
+                message: 'ProfileId não fornecido',
+            });
+        }
+
+        return this.#repository.getWatchlist(uid, profileId);
+    }
+
 
 
     getUserProfiles(uid: string) {
@@ -72,5 +63,18 @@ export class ProfileModel {
         return this.#repository.getProfileById(uid, profileId);
     }
 
+
+    createProfile(uid: string, data: { name: string; imgUrl?: string }) {
+        return this.#repository.createProfile(uid, data);
+    }
+
+
+    async updateProfile(uid: string, profileId: string, updatedData: any) {
+        return await this.repository.updateProfile(uid, profileId, updatedData);
+    }
+
+    deleteProfile(uid: string, profileId: string) {
+        return this.repository.deleteProfile(uid, profileId);
+    }
 
 }
