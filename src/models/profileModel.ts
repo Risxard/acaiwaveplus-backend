@@ -1,4 +1,4 @@
-import { ProfileRepository } from "../repository/profileRepository";
+import { ProfileRepository } from "../repository/profile.repository";
 
 export class ProfileModel {
     uid: string;
