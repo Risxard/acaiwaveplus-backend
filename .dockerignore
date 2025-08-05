@@ -1,5 +1,8 @@
 node_modules
-dist
+npm-debug.log
+Dockerfile
+.dockerignore
 .git
-*.log
+.gitignore
+firebase-admin-sdk.json
 .env
