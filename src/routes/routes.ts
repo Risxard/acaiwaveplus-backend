@@ -18,6 +18,4 @@ router.post('/profiles', authenticateFirebase, profileController.createProfile);
 router.patch('/profiles/:profileId', authenticateFirebase, profileController.updateProfile);
 router.delete('/profiles/:profileId', authenticateFirebase, profileController.deleteProfile);
 
-
-
 export const usersRoutes = router;

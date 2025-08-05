@@ -17,10 +17,10 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Instalar dependências
+      - name: Instalar dependências (local)
         run: npm ci
 
-      - name: Deploy para VPS (via SSH)
+      - name: Enviar código para VPS (SCP)
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -28,3 +28,15 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           source: "."
           target: "/srv/acaiwaveplus-api"
+
+      - name: Executar build no servidor (SSH)
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /srv/acaiwaveplus-api
+            npm ci
+            npm run build
+            docker-compose up -d --build
