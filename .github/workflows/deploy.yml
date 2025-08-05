@@ -12,24 +12,28 @@ jobs:
       - name: Checkout código
         uses: actions/checkout@v3
 
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Instalar dependências (local)
+      - name: Instalar dependências
         run: npm ci
 
-      - name: Enviar código para VPS (SCP)
+      - name: Build do projeto
+        run: npm run build
+
+      - name: Enviar arquivos para VPS via SCP
         uses: appleboy/scp-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          source: "."
+          source: "dist,package*.json,Dockerfile,docker-compose.yml"
           target: "/srv/acaiwaveplus-api"
 
-      - name: Executar build no servidor (SSH)
+          
+      - name: Rodar docker-compose na VPS
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.SSH_HOST }}
@@ -37,6 +41,5 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             cd /srv/acaiwaveplus-api
-            npm ci
-            npm run build
+            docker-compose down
             docker-compose up -d --build
