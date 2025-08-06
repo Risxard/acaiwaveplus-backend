@@ -1,9 +1,12 @@
-version: '3.9'
+version: '3.8'
+
 services:
   api:
     build: .
     ports:
-      - "7475:7475"
+      - "${PORT}:${PORT}"
+    env_file:
+      - .env
     volumes:
-      - .:/usr/src/app
-    restart: always
+      - .:/app
+    command: ["npm", "run", "start:prod"]

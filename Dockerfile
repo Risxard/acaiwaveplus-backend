@@ -1,12 +1,14 @@
-FROM node:18
+FROM node:20-alpine
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm ci
+RUN npm install
 
 COPY . .
+
+COPY .env .env
+COPY firebase-admin-sdk.json firebase-admin-sdk.json
 
 RUN npm run build
 

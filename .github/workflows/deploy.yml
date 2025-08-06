@@ -1,45 +1,37 @@
-name: Deploy to Production
+name: Deploy para VPS
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout código
-        uses: actions/checkout@v3
+      - name: Clonar repositório
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Configurar Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Instalar dependências
-        run: npm ci
+      - name: Criar arquivo .env e JSON
+        run: |
+          echo "PORT=7475" >> .env
+          echo "TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}" >> .env
+          echo '${{ secrets.FIREBASE_ADMIN_SDK_JSON }}' > firebase-admin-sdk.json
+          echo "FIREBASE_ADMIN_SDK=./firebase-admin-sdk.json" >> .env
 
-      - name: Build do projeto
-        run: npm run build
-
-      - name: Enviar arquivos para VPS via SCP
-        uses: appleboy/scp-action@master
+      - name: Login na VPS via SSH e Deploy
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          source: "dist,package*.json,Dockerfile,docker-compose.yml"
-          target: "/srv/acaiwaveplus-api"
-
-          
-      - name: Rodar docker-compose na VPS
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd /srv/acaiwaveplus-api
-            docker-compose down
-            docker-compose up -d --build
+            cd /caminho/do/projeto
+            git pull origin main
+            docker-compose --env-file .env up --build -d
