@@ -3,10 +3,9 @@ version: '3.8'
 services:
   api:
     build: .
+    container_name: acaiwaveplus-api
     ports:
-      - "${PORT}:${PORT}"
+      - "7475:7475"
     env_file:
       - .env
-    volumes:
-      - .:/app
-    command: ["npm", "run", "start:prod"]
+    restart: unless-stopped
