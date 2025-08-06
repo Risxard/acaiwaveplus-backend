@@ -10,28 +10,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Clonar repositório
-        uses: actions/checkout@v4
+      - name: Checkout do código
+        uses: actions/checkout@v3
 
-      - name: Configurar Node.js
-        uses: actions/setup-node@v4
+      - name: Enviar arquivos para o servidor
+        uses: appleboy/scp-action@v0.1.7
         with:
-          node-version: '20'
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "."
+          target: "/srv/acaiwaveplus-api"
 
-      - name: Criar arquivo .env e JSON
-        run: |
-          echo "PORT=7475" >> .env
-          echo "TMDB_API_KEY=${{ secrets.TMDB_API_KEY }}" >> .env
-          echo '${{ secrets.FIREBASE_ADMIN_SDK_JSON }}' > firebase-admin-sdk.json
-          echo "FIREBASE_ADMIN_SDK=./firebase-admin-sdk.json" >> .env
-
-      - name: Login na VPS via SSH e Deploy
+      - name: Executar comandos no servidor
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+          port: 22
           script: |
             cd /srv/acaiwaveplus-api
-            git pull origin main
             docker-compose --env-file .env up --build -d
