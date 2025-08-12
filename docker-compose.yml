@@ -2,10 +2,12 @@ version: '3.8'
 
 services:
   api:
-    build: .
     container_name: acaiwaveplus-api
-    ports:
-      - "7475:7475"
+    build:
+      context: .
+      dockerfile: Dockerfile
     env_file:
       - .env
-    restart: unless-stopped
+    ports:
+      - "7475:7475" 
+    restart: always

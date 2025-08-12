@@ -9,7 +9,7 @@ const userController = new UserController();
 const profileController = new ProfileController();
 
 
-router.get('/user', authenticateFirebase, userController.findByUser)
+router.get('/user', authenticateFirebase, userController.findByUser);
 router.get('/profiles', authenticateFirebase, profileController.getAllProfiles);
 router.get('/profiles/:profileId', authenticateFirebase, profileController.getProfileById);
 router.get('/profiles/:profileId/watchlist', authenticateFirebase, profileController.getWatchlist);

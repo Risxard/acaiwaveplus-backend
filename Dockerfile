@@ -1,14 +1,15 @@
-FROM node:18
 
-WORKDIR /usr/src/app
+FROM node:18-alpine
+
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --production
 
-COPY . .
+COPY dist ./dist
 
-RUN npm run build
+COPY .env .env
 
 EXPOSE 7475
 
