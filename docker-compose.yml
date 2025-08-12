@@ -1,9 +1,13 @@
-version: '3.9'
+version: '3.8'
+
 services:
   api:
-    build: .
+    container_name: acaiwaveplus-api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
     ports:
-      - "7475:7475"
-    volumes:
-      - .:/usr/src/app
+      - "7475:7475" 
     restart: always

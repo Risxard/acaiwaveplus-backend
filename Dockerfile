@@ -1,13 +1,16 @@
-FROM node:18
 
-WORKDIR /usr/src/app
+FROM node:18-alpine
+
+WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm ci
+RUN npm install --production
 
-COPY . .
+COPY dist ./dist
 
-RUN npm run build
+COPY .env .env
 
-CMD ["npm", "run", "start:prod"]
+EXPOSE 7475
+
+CMD ["node", "dist/server.js"]
