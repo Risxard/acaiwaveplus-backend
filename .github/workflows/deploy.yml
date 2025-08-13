@@ -26,5 +26,21 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
+<<<<<<< HEAD
+          source: "dist,package*.json,Dockerfile,docker-compose.yml"
+          target: "/srv/acaiwaveplus-api"
+
+      - name: Rodar docker-compose na VPS via SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            cd /srv/acaiwaveplus-api
+            docker-compose down
+            docker-compose up -d --build
+=======
           source: "."
           target: "/srv/acaiwaveplus-api"
+>>>>>>> 160be057cde509eb0bd3a8150070efc10b65fecf
