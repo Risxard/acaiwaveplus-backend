@@ -1,12 +1,37 @@
-
+# Node.js
 node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
 
-.env
-firebase-admin-sdk.json
-
-
+# Build
 dist/
 
-*.log
 
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+
+*.log
+*.out
+*.pid
+
+# Environment
+.env
+.env.*
+
+# Docker
+*.local
+docker-compose.override.yml
+
+# Firebase secrets
+firebase-admin-sdk.json
+
+# VSCode settings (opcional)
+.vscode/
+
+# OS files
 .DS_Store
+Thumbs.db
