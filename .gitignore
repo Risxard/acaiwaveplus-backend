@@ -7,7 +7,6 @@ firebase-admin-sdk.json
 
 dist/
 
-
 *.log
 
 .DS_Store
