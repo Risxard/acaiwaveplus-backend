@@ -90,6 +90,11 @@ export class ProfileRepository {
         const profilesRef = userRef.collection('profiles');
 
         const existingProfiles = await profilesRef.get();
+
+        if (existingProfiles.size >= 5) {
+            throw new Error("Número máximo de perfis (5) atingido");
+        }
+
         const isMain = existingProfiles.empty;
 
         const settingsRef = userRef.collection('mainAccount').doc('settings');
@@ -123,6 +128,7 @@ export class ProfileRepository {
 
         return { id: newProfileRef.id, ...profileData };
     }
+
 
 
     async updateProfile(uid: string, profileId: string, updatedData: any) {
