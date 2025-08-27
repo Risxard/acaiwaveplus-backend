@@ -39,3 +39,21 @@ export interface ImagesResponse<T> {
   logos: ImagesInterface[];
   id: number;
 }
+
+export interface VideosInterface {
+  iso_639_1: string | null;
+  iso_3166_1: string | null;
+  name: string;
+  key: string;
+  site: string;
+  size: number;
+  type: string;
+  official: boolean;
+  published_at: string;
+  id: string;
+}
+
+export interface VideosResponse<T> {
+  results: VideosInterface[];
+  id: number;
+}

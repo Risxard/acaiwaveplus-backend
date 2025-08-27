@@ -1,6 +1,6 @@
 import axios from "axios";
 import { TMDB_CONFIG } from "../config/tmdb";
-import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBResponse } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
 
 class TMDBRepository {
   async fetchTrending(
@@ -25,10 +25,25 @@ class TMDBRepository {
   }
 
 
-  async fetchImagesById(mediaId: number, mediaType: string, language: string){
-    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/images`;
+  async fetchImagesById(mediaId: number, mediaType: string, language: string) {
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/images?include_image_language=en%2Cjp`;
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        language,
+      },
+    });
 
-        const { data } = await axios.get<ImagesResponse<ImagesInterface>>(url, {
+    return data;
+  }
+
+
+  async getVideoById(mediaId: number, mediaType: string, language: string) {
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/videos`;
+
+    const { data } = await axios.get<VideosResponse<VideosInterface>>(url, {
       headers: {
         Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
       },

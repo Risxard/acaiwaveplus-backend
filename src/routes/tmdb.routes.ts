@@ -10,5 +10,6 @@ router.get("/tmdb/images", authenticateFirebase, (req, res) => tmdbController.ge
 router.get("/tmdb/images/logos", authenticateFirebase, (req, res) => tmdbController.getLogoImagesById(req, res));
 router.get("/tmdb/images/posters", authenticateFirebase, (req, res) => tmdbController.getBackdropsImagesById(req, res));
 router.get("/tmdb/images/backdrops", authenticateFirebase, (req, res) => tmdbController.getBackdropsImagesById(req, res));
+router.get("/tmdb/video", authenticateFirebase, (req, res) => tmdbController.getVideoById(req, res));
 
 export default router;

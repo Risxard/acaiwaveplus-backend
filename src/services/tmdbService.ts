@@ -1,7 +1,8 @@
 
 import tmdbRepository from "../repository/tmdb.repository";
-import { ImagesInterface, ImagesResponse, TMDBMedia } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBMedia, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
+import videoFilter from "../utils/videoFilter";
 
 class TMDBService {
 
@@ -88,26 +89,76 @@ class TMDBService {
 
 
 
-  async getLogoImagesById(
+async getLogoImagesById(
+  mediaId: number,
+  mediaType: string,
+  language: string
+): Promise<ImagesInterface[]> {
+  const normalizedLanguage = language.includes("-")
+    ? language.split("-")[0]
+    : language;
+
+  const cacheKey = `logos:${mediaType}:${mediaId}:${normalizedLanguage}`;
+  const cached = cache.get<ImagesInterface[]>(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const data = await tmdbRepository.fetchImagesById(
+    mediaId,
+    mediaType,
+    normalizedLanguage
+  );
+
+  const logos = data.logos[0] || {};
+
+  cache.set(cacheKey, logos);
+
+  return logos;
+}
+
+
+
+
+  async getVideoById(
     mediaId: number,
     mediaType: string,
-    language: string
-  ): Promise<ImagesInterface[]> {
-    const cacheKey = `logos:${mediaType}:${mediaId}:${language}`;
-    const cached = cache.get<ImagesInterface[]>(cacheKey);
+    language: string,
+    originalLanguage: string
+  ): Promise<string | null | false> {
+    const cacheKey = `videos:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+    const cached = cache.get<string | null | false>(cacheKey);
 
     if (cached) {
       return cached;
     }
 
-    const data = await tmdbRepository.fetchImagesById(mediaId, mediaType, language);
+    const data = await tmdbRepository.getVideoById(mediaId, mediaType, language);
+    const results = data.results;
 
-    const logos = data.logos;
+    let resultado = await videoFilter(results, language, originalLanguage);
 
-    cache.set(cacheKey, logos);
 
-    return logos;
+    if (resultado === null && originalLanguage !== "en-US") {
+      const dataFallback = await tmdbRepository.getVideoById(mediaId, mediaType, originalLanguage);
+      const resultsFallback = dataFallback.results;
+      resultado = await videoFilter(resultsFallback, originalLanguage, originalLanguage);
+    }
+
+    if (resultado === null && language !== "en-US" && originalLanguage !== "en-US") {
+      const dataEn = await tmdbRepository.getVideoById(mediaId, mediaType, "en-US");
+      const resultsEn = dataEn.results;
+      resultado = await videoFilter(resultsEn, "en-US", originalLanguage);
+    }
+
+    cache.set(cacheKey, resultado);
+
+    return resultado;
   }
+
+
+
 
 }
 

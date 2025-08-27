@@ -122,5 +122,29 @@ export default class TMDBController {
     }
   };
 
+  getVideoById = async (req: Request, res: Response) => {
+    try {
+      const { mediaId, mediaType, language, originalLanguage } = req.query;
+
+      if (!mediaId || !mediaType || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaId, mediaType e language",
+        });
+      }
+
+      const movies = await tmdbService.getVideoById(
+        Number(mediaId),
+        mediaType as "movie" | "tv",
+        language as string,
+        originalLanguage as string
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar video." });
+    }
+  };
+
 }
 
