@@ -7,7 +7,7 @@ export default class TMDBController {
       const { timeWindow, pageType, language, page = 1 } = req.query;
 
 
-      if (!timeWindow || !pageType || !language) {
+      if (!timeWindow || !pageType || !language || !page) {
         return res.status(400).json({
           error: "Parâmetros obrigatórios: timeWindow, pageType, language",
         });
@@ -27,12 +27,63 @@ export default class TMDBController {
     }
   }
 
+  getRecommendations = async (req: Request, res: Response) => {
+    try {
+      const { mediaType, mediaId, language, page = 1 } = req.query;
+
+      if (!mediaType || !mediaId || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaType, mediaId, language, page",
+        });
+      }
+
+      const movies = await tmdbService.getRecommendations(
+        mediaType as "movie" | "tv",
+        Number(mediaId),
+        language as string,
+        Number(page),
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar recomendações." });
+    }
+  };
+
+  getNowPlaying = async (req: Request, res: Response) => {
+    try {
+      const { pageType, language, region, page = 1 } = req.query;
+
+      if (!pageType || !region || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaType, mediaId, language, page",
+        });
+      }
+
+
+
+      const movies = await tmdbService.getNowPlaying(
+        pageType as "movie" | "tv",
+        language as string,
+        region as string,
+        Number(page),
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar nos cinemas." });
+    }
+  };
+
+
 
   getImagesById = async (req: Request, res: Response) => {
     try {
-      const { mediaId, mediaType, language } = req.query;
+      const { mediaId, mediaType, language, originalLanguage } = req.query;
 
-      if (!mediaId || !mediaType || !language) {
+      if (!mediaId || !mediaType || !language || !originalLanguage) {
         return res.status(400).json({
           error: "Parâmetros obrigatórios: mediaId, mediaType e language",
         });
@@ -41,7 +92,8 @@ export default class TMDBController {
       const movies = await tmdbService.getImagesById(
         Number(mediaId),
         mediaType as "movie" | "tv",
-        language as string
+        language as string,
+        originalLanguage as string
       );
 
       return res.status(200).json(movies);
@@ -54,9 +106,9 @@ export default class TMDBController {
 
   getLogoImagesById = async (req: Request, res: Response) => {
     try {
-      const { mediaId, mediaType, language } = req.query;
+      const { mediaId, mediaType, language, originalLanguage } = req.query;
 
-      if (!mediaId || !mediaType || !language) {
+      if (!mediaId || !mediaType || !language || !originalLanguage) {
         return res.status(400).json({
           error: "Parâmetros obrigatórios: mediaId, mediaType e language",
         });
@@ -65,7 +117,8 @@ export default class TMDBController {
       const movies = await tmdbService.getLogoImagesById(
         Number(mediaId),
         mediaType as "movie" | "tv",
-        language as string
+        language as string,
+        originalLanguage as string
       );
 
       return res.status(200).json(movies);
@@ -77,9 +130,9 @@ export default class TMDBController {
 
   getPostersImagesById = async (req: Request, res: Response) => {
     try {
-      const { mediaId, mediaType, language } = req.query;
+      const { mediaId, mediaType, language, originalLanguage } = req.query;
 
-      if (!mediaId || !mediaType || !language) {
+      if (!mediaId || !mediaType || !language || !originalLanguage) {
         return res.status(400).json({
           error: "Parâmetros obrigatórios: mediaId, mediaType e language",
         });
@@ -88,7 +141,8 @@ export default class TMDBController {
       const movies = await tmdbService.getLogoImagesById(
         Number(mediaId),
         mediaType as "movie" | "tv",
-        language as string
+        language as string,
+        originalLanguage as string
       );
 
       return res.status(200).json(movies);
@@ -101,9 +155,9 @@ export default class TMDBController {
 
   getBackdropsImagesById = async (req: Request, res: Response) => {
     try {
-      const { mediaId, mediaType, language } = req.query;
+      const { mediaId, mediaType, language, originalLanguage } = req.query;
 
-      if (!mediaId || !mediaType || !language) {
+      if (!mediaId || !mediaType || !language || !originalLanguage) {
         return res.status(400).json({
           error: "Parâmetros obrigatórios: mediaId, mediaType e language",
         });
@@ -112,7 +166,8 @@ export default class TMDBController {
       const movies = await tmdbService.getLogoImagesById(
         Number(mediaId),
         mediaType as "movie" | "tv",
-        language as string
+        language as string,
+        originalLanguage as string
       );
 
       return res.status(200).json(movies);
