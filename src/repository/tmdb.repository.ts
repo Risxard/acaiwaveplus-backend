@@ -70,6 +70,43 @@ class TMDBRepository {
     return data;
   }
 
+  async fetchPerGenres(
+    pageType: "movie" | "tv",
+    language: string,
+    with_genres: string,
+    without_genres: string,
+    sort_by: string,
+    page: number = 1,
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/discover/${pageType}`;
+
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        language,
+        with_genres,
+        without_genres,
+        sort_by,
+        page,
+      },
+    });
+
+    return data;
+  }
+
+
+
+
+
+
+
+
+
+
+
 
   async fetchImagesById(mediaId: number, mediaType: string, language: string, originalLanguage: string) {
 

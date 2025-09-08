@@ -45,7 +45,7 @@ class TMDBService {
       return cached;
     }
 
-   
+
 
 
     const data = await tmdbRepository.fetchNowPlaying(pageType, language, region, page);
@@ -54,6 +54,38 @@ class TMDBService {
 
     return movies;
   }
+
+
+
+  async getPerGenres(pageType: "movie" | "tv",
+    language: string,
+    with_genres: string,
+    without_genres: string,
+    sort_by: string,
+    page: number = 1,): Promise<TMDBMedia[]> {
+    const cacheKey = `pergenres:${pageType}:${language}:${with_genres}${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const data = await tmdbRepository.fetchPerGenres(pageType, language, with_genres, without_genres, sort_by, page);
+    const medias = data.results.slice(0, 20);
+    cache.set(cacheKey, medias);
+
+    return medias;
+  }
+
+
+
+
+
+
+
+
+
+
 
 
   async getImagesById(

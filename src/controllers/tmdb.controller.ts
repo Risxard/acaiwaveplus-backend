@@ -77,6 +77,36 @@ export default class TMDBController {
     }
   };
 
+  getPerGenres = async (req: Request, res: Response) => {
+    try {
+      const { pageType, language, with_genres, without_genres, sort_by = "popularity.desc", page = 1 } = req.query;
+
+      if (!pageType || !language || !with_genres) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: pageType, language e with_genres",
+        });
+      }
+
+      const data = await tmdbService.getPerGenres(
+        pageType as "movie" | "tv",
+        language as string,
+        with_genres as string,
+        without_genres as string,
+        sort_by as string,
+        Number(page),
+      );
+
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar medias por genero." });
+    }
+  };
+
+
+
+
+
 
 
   getImagesById = async (req: Request, res: Response) => {
