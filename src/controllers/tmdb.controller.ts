@@ -79,11 +79,11 @@ export default class TMDBController {
 
   getPerGenres = async (req: Request, res: Response) => {
     try {
-      const { pageType, language, with_genres, without_genres, sort_by = "popularity.desc", page = 1 } = req.query;
+      const { pageType, language, with_genres, page } = req.query;
 
-      if (!pageType || !language || !with_genres) {
+      if (!pageType || !language || !with_genres || !page) {
         return res.status(400).json({
-          error: "Parâmetros obrigatórios: pageType, language e with_genres",
+          error: "Parâmetros obrigatórios: pageType, language, page e with_genres",
         });
       }
 
@@ -91,8 +91,6 @@ export default class TMDBController {
         pageType as "movie" | "tv",
         language as string,
         with_genres as string,
-        without_genres as string,
-        sort_by as string,
         Number(page),
       );
 

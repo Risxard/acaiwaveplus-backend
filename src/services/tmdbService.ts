@@ -60,8 +60,6 @@ class TMDBService {
   async getPerGenres(pageType: "movie" | "tv",
     language: string,
     with_genres: string,
-    without_genres: string,
-    sort_by: string,
     page: number = 1,): Promise<TMDBMedia[]> {
     const cacheKey = `pergenres:${pageType}:${language}:${with_genres}${page}`;
     const cached = cache.get<TMDBMedia[]>(cacheKey);
@@ -69,6 +67,11 @@ class TMDBService {
     if (cached) {
       return cached;
     }
+
+
+    const without_genres = "";
+    const sort_by = "";
+
 
     const data = await tmdbRepository.fetchPerGenres(pageType, language, with_genres, without_genres, sort_by, page);
     const medias = data.results.slice(0, 20);
