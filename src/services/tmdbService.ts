@@ -2,6 +2,7 @@
 import tmdbRepository from "../repository/tmdb.repository";
 import { ImagesInterface, ImagesResponse, TMDBMedia, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
+import buildWithoutGenres from "../utils/functions";
 import videoFilter from "../utils/videoFilter";
 
 class TMDBService {
@@ -57,10 +58,12 @@ class TMDBService {
 
 
 
-  async getPerGenres(pageType: "movie" | "tv",
+  async getPerGenres(
+    pageType: "movie" | "tv",
     language: string,
     with_genres: string,
-    page: number = 1,): Promise<TMDBMedia[]> {
+    page: number = 1
+  ): Promise<TMDBMedia[]> {
     const cacheKey = `pergenres:${pageType}:${language}:${with_genres}${page}`;
     const cached = cache.get<TMDBMedia[]>(cacheKey);
 
@@ -68,23 +71,25 @@ class TMDBService {
       return cached;
     }
 
+    const selectedGenre = Number(with_genres);
+    const without_genres = buildWithoutGenres(pageType, selectedGenre);
 
-    const without_genres = "";
     const sort_by = "";
 
+    const data = await tmdbRepository.fetchPerGenres(
+      pageType,
+      language,
+      with_genres,
+      without_genres,
+      sort_by,
+      page
+    );
 
-    const data = await tmdbRepository.fetchPerGenres(pageType, language, with_genres, without_genres, sort_by, page);
     const medias = data.results.slice(0, 20);
     cache.set(cacheKey, medias);
 
     return medias;
   }
-
-
-
-
-
-
 
 
 
