@@ -76,6 +76,7 @@ class TMDBRepository {
     with_genres: string,
     without_genres: string,
     sort_by: string,
+    include_adult: string,
     page: number = 1,
   ): Promise<TMDBResponse<TMDBMedia>> {
     const url = `${TMDB_CONFIG.baseUrl}/discover/${pageType}`;
@@ -90,6 +91,7 @@ class TMDBRepository {
         with_genres,
         without_genres,
         sort_by,
+        include_adult,
         page,
       },
     });
