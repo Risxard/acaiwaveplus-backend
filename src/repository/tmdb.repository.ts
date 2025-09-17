@@ -134,7 +134,7 @@ class TMDBRepository {
   }
 
 
-  async getVideoById(mediaId: number, mediaType: string, language: string) {
+  async fetchVideoById(mediaId: number, mediaType: string, language: string) {
     const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/videos`;
 
     const { data } = await axios.get<VideosResponse<VideosInterface>>(url, {
@@ -148,6 +148,56 @@ class TMDBRepository {
 
     return data;
   }
+
+
+
+
+  async fetchSearchMulti(
+    query: string,
+    language: string,
+    page: number = 1,
+
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/search/multi`;
+
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        query,
+        language,
+        page,
+      },
+    });
+
+    return data;
+  }
+
+  async fetchSearchPerson(
+    query: string,
+    language: string,
+    page: number = 1,
+
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/search/person`;
+
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        query,
+        language,
+        page,
+      },
+    });
+
+    return data;
+  }
+
 }
 
 export default new TMDBRepository();

@@ -106,7 +106,7 @@ class TMDBService {
     language: string,
     originalLanguage: string
   ): Promise<ImagesResponse<ImagesInterface>> {
-    const cacheKey = `${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+    const cacheKey = `images:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
     const cached = cache.get<ImagesResponse<ImagesInterface>>(cacheKey);
 
     if (cached) {
@@ -309,20 +309,20 @@ class TMDBService {
       return cached;
     }
 
-    const data = await tmdbRepository.getVideoById(mediaId, mediaType, language);
+    const data = await tmdbRepository.fetchVideoById(mediaId, mediaType, language);
     const results = data.results;
 
     let resultado = await videoFilter(results, language, originalLanguage);
 
 
     if (resultado === null && originalLanguage !== "en-US") {
-      const dataFallback = await tmdbRepository.getVideoById(mediaId, mediaType, originalLanguage);
+      const dataFallback = await tmdbRepository.fetchVideoById(mediaId, mediaType, originalLanguage);
       const resultsFallback = dataFallback.results;
       resultado = await videoFilter(resultsFallback, originalLanguage, originalLanguage);
     }
 
     if (resultado === null && language !== "en-US" && originalLanguage !== "en-US") {
-      const dataEn = await tmdbRepository.getVideoById(mediaId, mediaType, "en-US");
+      const dataEn = await tmdbRepository.fetchVideoById(mediaId, mediaType, "en-US");
       const resultsEn = dataEn.results;
       resultado = await videoFilter(resultsEn, "en-US", originalLanguage);
     }
@@ -331,6 +331,61 @@ class TMDBService {
 
     return resultado;
   }
+
+
+  async getSearchMulti(
+    query: string,
+    language: string,
+    page: number = 1
+  ): Promise<TMDBMedia[]> {
+    const cacheKey = `searchmulti:${query}:${language}:${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+
+
+    const data = await tmdbRepository.fetchSearchMulti(
+      query,
+      language,
+      page
+    );
+
+    const medias = data.results;
+    cache.set(cacheKey, medias);
+
+    return medias;
+  }
+
+  async getSearchPerson(
+    query: string,
+    language: string,
+    page: number = 1
+  ): Promise<TMDBMedia[]> {
+    const cacheKey = `searchperson:${query}:${language}:${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+
+
+    const data = await tmdbRepository.fetchSearchPerson(
+      query,
+      language,
+      page
+    );
+
+    const medias = data.results;
+    cache.set(cacheKey, medias);
+
+    return medias;
+  }
+
+
 }
 
 export default new TMDBService();

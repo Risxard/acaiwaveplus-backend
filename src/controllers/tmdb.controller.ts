@@ -230,5 +230,51 @@ export default class TMDBController {
     }
   };
 
+    getSearchMulti = async (req: Request, res: Response) => {
+    try {
+      const { query, language, page } = req.query;
+
+      if (!query || !language || !page) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: query, language e page",
+        });
+      }
+
+      const movies = await tmdbService.getSearchMulti(
+        query as string,
+        language as string,
+        Number(page),
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar SearchMulti." });
+    }
+  };
+
+    getSearchPerson= async (req: Request, res: Response) => {
+    try {
+      const { query, language, page } = req.query;
+
+      if (!query || !language || !page) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: query, language e page",
+        });
+      }
+
+      const movies = await tmdbService.getSearchPerson(
+        query as string,
+        language as string,
+        Number(page),
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar SearchMulti." });
+    }
+  };
+
 }
 
