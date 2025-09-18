@@ -1,6 +1,6 @@
 
 import tmdbRepository from "../repository/tmdb.repository";
-import { ImagesInterface, ImagesResponse, TMDBMedia, VideosInterface } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
 import { mapMovieGenreToTvGenre, buildWithoutGenres } from "../utils/functions";
 import videoFilter from "../utils/videoFilter";
@@ -360,29 +360,25 @@ class TMDBService {
   }
 
   async getSearchPerson(
-    query: string,
+    person_id: number,
     language: string,
-    page: number = 1
-  ): Promise<TMDBMedia[]> {
-    const cacheKey = `searchperson:${query}:${language}:${page}`;
-    const cached = cache.get<TMDBMedia[]>(cacheKey);
+  ): Promise<TMDBPersonResponse> {
+    const cacheKey = `searchperson:${person_id}:${language}`;
+    const cached = cache.get<TMDBPersonResponse>(cacheKey);
 
-    if (cached) {
-      return cached;
-    }
+    if (cached) return cached;
 
-
+    const append_to_response = "movie_credits,tv_credits";
 
     const data = await tmdbRepository.fetchSearchPerson(
-      query,
+      person_id,
       language,
-      page
+      append_to_response,
     );
 
-    const medias = data.results;
-    cache.set(cacheKey, medias);
+    cache.set(cacheKey, data);
 
-    return medias;
+    return data;
   }
 
 

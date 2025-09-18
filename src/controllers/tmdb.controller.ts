@@ -255,24 +255,23 @@ export default class TMDBController {
 
     getSearchPerson= async (req: Request, res: Response) => {
     try {
-      const { query, language, page } = req.query;
+      const { person_id, language} = req.query;
 
-      if (!query || !language || !page) {
+      if (!person_id || !language) {
         return res.status(400).json({
-          error: "Parâmetros obrigatórios: query, language e page",
+          error: "Parâmetros obrigatórios: person_id, language",
         });
       }
 
       const movies = await tmdbService.getSearchPerson(
-        query as string,
+        Number(person_id),
         language as string,
-        Number(page),
       );
 
       return res.status(200).json(movies);
     } catch (error) {
       console.error("Erro no controller:", error);
-      return res.status(500).json({ error: "Erro ao buscar SearchMulti." });
+      return res.status(500).json({ error: "Erro ao buscar Search Person." });
     }
   };
 

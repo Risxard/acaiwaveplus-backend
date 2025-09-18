@@ -1,6 +1,6 @@
 import axios from "axios";
 import { TMDB_CONFIG } from "../config/tmdb";
-import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBPersonResponse, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
 
 class TMDBRepository {
   async fetchTrending(
@@ -176,27 +176,27 @@ class TMDBRepository {
   }
 
   async fetchSearchPerson(
-    query: string,
+    person_id: number,
     language: string,
-    page: number = 1,
+    append_to_response: string,
+  ): Promise<TMDBPersonResponse> {   // <-- CORRETO
+    const url = `${TMDB_CONFIG.baseUrl}/person/${person_id}`;
 
-  ): Promise<TMDBResponse<TMDBMedia>> {
-    const url = `${TMDB_CONFIG.baseUrl}/search/person`;
-
-
-    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+    const { data } = await axios.get<TMDBPersonResponse>(url, {
       headers: {
         Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
       },
       params: {
-        query,
         language,
-        page,
+        append_to_response,
       },
     });
 
+    console.log(data);
+
     return data;
   }
+
 
 }
 
