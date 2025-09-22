@@ -88,3 +88,12 @@ export interface TMDBPersonResponse {
   movie_credits: TMDBCredits;
   tv_credits: TMDBCredits;
 }
+
+export interface TMDBGenre {
+  id: number;
+  name: string;
+}
+
+export interface TMDBGenresResponse {
+  genres: TMDBGenre[];
+}

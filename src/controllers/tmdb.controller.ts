@@ -230,7 +230,7 @@ export default class TMDBController {
     }
   };
 
-    getSearchMulti = async (req: Request, res: Response) => {
+  getSearchMulti = async (req: Request, res: Response) => {
     try {
       const { query, language, page } = req.query;
 
@@ -253,9 +253,9 @@ export default class TMDBController {
     }
   };
 
-    getSearchPerson= async (req: Request, res: Response) => {
+  getSearchPerson = async (req: Request, res: Response) => {
     try {
-      const { person_id, language} = req.query;
+      const { person_id, language } = req.query;
 
       if (!person_id || !language) {
         return res.status(400).json({
@@ -272,6 +272,51 @@ export default class TMDBController {
     } catch (error) {
       console.error("Erro no controller:", error);
       return res.status(500).json({ error: "Erro ao buscar Search Person." });
+    }
+  };
+
+  getGenres = async (req: Request, res: Response) => {
+    try {
+      const { pageType, language } = req.query;
+
+      if (!pageType || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: pageType e language",
+        });
+      }
+
+      const movies = await tmdbService.getGenres(
+        pageType as "movie" | "tv",
+        language as string,
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar genres no controller." });
+    }
+  };
+
+  getClassification = async (req: Request, res: Response) => {
+    try {
+      const { mediaType, mediaId, language } = req.query;
+
+      if (!mediaType || !mediaId || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaType, mediaId, language",
+        });
+      }
+
+      const movies = await tmdbService.getClassification(
+        mediaType as "movie" | "tv",
+        Number(mediaId),
+        language as string,
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar Classification no controller." });
     }
   };
 

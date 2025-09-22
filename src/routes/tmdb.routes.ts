@@ -20,5 +20,7 @@ router.get("/tmdb/perGenres", authenticateFirebase, (req, res) => tmdbController
 
 router.get("/tmdb/search/multi", authenticateFirebase, (req, res) => tmdbController.getSearchMulti(req, res));
 router.get("/tmdb/search/person", authenticateFirebase, (req, res) => tmdbController.getSearchPerson(req, res));
+router.get("/tmdb/genres", authenticateFirebase, (req, res) => tmdbController.getGenres(req, res));
+router.get("/tmdb/classification", authenticateFirebase, (req, res) => tmdbController.getClassification(req, res));
 
 export default router;

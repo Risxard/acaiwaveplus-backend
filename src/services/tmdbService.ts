@@ -1,6 +1,6 @@
 
 import tmdbRepository from "../repository/tmdb.repository";
-import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBGenre, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
 import { mapMovieGenreToTvGenre, buildWithoutGenres } from "../utils/functions";
 import videoFilter from "../utils/videoFilter";
@@ -380,6 +380,58 @@ class TMDBService {
 
     return data;
   }
+
+  async getGenres(
+    pageType: "movie" | "tv",
+    language: string
+  ): Promise<TMDBGenre[]> {
+    const cacheKey = `genres:${pageType}:${language}`;
+    const cached = cache.get<TMDBGenre[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const data = await tmdbRepository.fetchGenres(pageType, language);
+    const genres = data.genres;
+    cache.set(cacheKey, genres);
+
+    return genres;
+  }
+
+  async getClassification(
+    mediaType: "movie" | "tv",
+    mediaId: number,
+    language: string
+  ): Promise<any> {
+    const cacheKey = `classification:${mediaType}${mediaId}:${language}`;
+    const cached = cache.get<any>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    // extrai só a parte do país (BR, US etc)
+    const country = language.split("-")[1]; // "pt-BR" → "BR"
+
+    let data;
+    if (mediaType === "movie") {
+      data = await tmdbRepository.fetchClassificationMovie(mediaId);
+    } else {
+      data = await tmdbRepository.fetchClassificationTv(mediaId);
+    }
+
+    // filtra pelo país
+    const classification = data.results.find(
+      (item: any) => item.iso_3166_1 === country
+    );
+
+    cache.set(cacheKey, classification);
+
+    return classification;
+  }
+
+
 
 
 }
