@@ -22,22 +22,35 @@ class TMDBService {
     return movies;
   }
 
-  async getMediaDetail(mediaType: "movie" | "tv", mediaId: number, language: string): Promise<TMDBMedia[]> {
-    const cacheKey = `mediadetail:${mediaType}:${mediaId}:${language}`;
-    const cached = cache.get<TMDBMedia[]>(cacheKey);
+async getMediaDetail(
+  mediaType: "movie" | "tv",
+  mediaId: number,
+  language: string
+): Promise<TMDBMedia> {
+  const cacheKey = `mediadetail:${mediaType}:${mediaId}:${language}`;
+  const cached = cache.get<TMDBMedia>(cacheKey);
 
-    if (cached) {
-      return cached;
-    }
-
-    const append_to_response = "videos,similar,translations,credits";
-
-    const res = await tmdbRepository.fetchMediaDetails(mediaType, mediaId, append_to_response, language);
-    const data = res.results;
-    cache.set(cacheKey, data);
-
-    return data;
+  if (cached) {
+    return cached;
   }
+
+  const append_to_response = "videos,similar,translations,credits";
+
+  const response = await tmdbRepository.fetchMediaDetails(
+    mediaType,
+    mediaId,
+    append_to_response,
+    language
+  );
+
+
+  const mediaDetail = response.results[0];
+
+  cache.set(cacheKey, mediaDetail);
+
+  return mediaDetail;
+}
+
 
 
   async getRecommendations(mediaType: "movie" | "tv", mediaId: number, language: string, page: number): Promise<TMDBMedia[]> {

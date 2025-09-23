@@ -28,24 +28,28 @@ class TMDBRepository {
     mediaType: "movie" | "tv",
     mediaId: number,
     append_to_response: string,
-    language: string,
+    language: string
   ): Promise<TMDBResponse<TMDBMedia>> {
-    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}&append_to_response=${append_to_response}`;
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}`;
 
-
-    console.log(url)
-
-    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+    const { data } = await axios.get(url, {
       headers: {
         Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
       },
       params: {
         language,
+        append_to_response,
       },
     });
 
-    return data;
+    return {
+      page: 1,
+      results: [data],
+      total_pages: 1,
+      total_results: 1,
+    };
   }
+
 
 
   async fetchRecommendations(
