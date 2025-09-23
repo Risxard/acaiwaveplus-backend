@@ -27,6 +27,30 @@ export default class TMDBController {
     }
   }
 
+  getMediaDetails = async (req: Request, res: Response) => {
+    try {
+      const { mediaType, mediaId, language } = req.query;
+
+
+      if (!mediaType || !mediaId || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaType, mediaId, language",
+        });
+      }
+
+      const data = await tmdbService.getMediaDetail(
+        mediaType as "movie" | "tv",
+        Number (mediaId),
+        language as string,
+      );
+
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar mediaDetails." });
+    }
+  }
+
   getRecommendations = async (req: Request, res: Response) => {
     try {
       const { mediaType, mediaId, language, page = 1 } = req.query;

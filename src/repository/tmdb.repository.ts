@@ -23,6 +23,31 @@ class TMDBRepository {
 
     return data;
   }
+
+  async fetchMediaDetails(
+    mediaType: "movie" | "tv",
+    mediaId: number,
+    append_to_response: string,
+    language: string,
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}&append_to_response=${append_to_response}`;
+
+
+    console.log(url)
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        language,
+      },
+    });
+
+    return data;
+  }
+
+
   async fetchRecommendations(
     mediaType: "movie" | "tv",
     mediaId: number,
@@ -75,11 +100,15 @@ class TMDBRepository {
     language: string,
     with_genres: string,
     without_genres: string,
-    sort_by: string,
     include_adult: string,
-    page: number = 1,
+    certification: string,
+    sort_by: string,
+    region: string,
+    page: number = 1
   ): Promise<TMDBResponse<TMDBMedia>> {
-    const url = `${TMDB_CONFIG.baseUrl}/discover/${pageType}`;
+    const url = `${TMDB_CONFIG.baseUrl}/discover/${pageType}?certification=${certification}&certification_country=${region}`;
+
+
 
 
     const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
@@ -90,14 +119,15 @@ class TMDBRepository {
         language,
         with_genres,
         without_genres,
-        sort_by,
         include_adult,
+        sort_by,
         page,
       },
     });
 
     return data;
   }
+
 
 
 

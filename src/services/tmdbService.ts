@@ -2,7 +2,7 @@
 import tmdbRepository from "../repository/tmdb.repository";
 import { ImagesInterface, ImagesResponse, TMDBGenre, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
-import { mapMovieGenreToTvGenre, buildWithoutGenres } from "../utils/functions";
+import { mapMovieGenreToTvGenre, buildWithoutGenres, mapCertificationGenre } from "../utils/functions";
 import videoFilter from "../utils/videoFilter";
 
 class TMDBService {
@@ -16,10 +16,27 @@ class TMDBService {
     }
 
     const data = await tmdbRepository.fetchTrending(timeWindow, pageType, language, page);
-    const movies = data.results.slice(0, 10);
+    const movies = data.results.slice(0, 20);
     cache.set(cacheKey, movies);
 
     return movies;
+  }
+
+  async getMediaDetail(mediaType: "movie" | "tv", mediaId: number, language: string): Promise<TMDBMedia[]> {
+    const cacheKey = `mediadetail:${mediaType}:${mediaId}:${language}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const append_to_response = "videos,similar,translations,credits";
+
+    const res = await tmdbRepository.fetchMediaDetails(mediaType, mediaId, append_to_response, language);
+    const data = res.results;
+    cache.set(cacheKey, data);
+
+    return data;
   }
 
 
@@ -65,7 +82,12 @@ class TMDBService {
     sort_by: string,
     page: number = 1
   ): Promise<TMDBMedia[]> {
-    const cacheKey = `pergenres:${pageType}:${language}:${with_genres}:${sort_by}:${page}`;
+    const region = language.includes("-")
+      ? language.split("-")[1]
+      : language;
+
+
+    const cacheKey = `pergenres:${pageType}:${language}:${region}:${with_genres}:${sort_by}:${page}`;
     const cached = cache.get<TMDBMedia[]>(cacheKey);
 
     if (cached) {
@@ -73,6 +95,12 @@ class TMDBService {
     }
 
     const selectedGenre = Number(with_genres);
+
+
+    const certification = mapCertificationGenre(pageType, selectedGenre, region);
+
+
+
     const adjustedGenre =
       pageType === "tv" ? mapMovieGenreToTvGenre(selectedGenre) : selectedGenre;
 
@@ -85,7 +113,9 @@ class TMDBService {
       adjustedGenre.toString(),
       without_genres,
       include_adult,
+      certification,
       sort_by,
+      region,
       page
     );
 
@@ -94,6 +124,7 @@ class TMDBService {
 
     return medias;
   }
+
 
 
 
@@ -411,8 +442,7 @@ class TMDBService {
       return cached;
     }
 
-    // extrai só a parte do país (BR, US etc)
-    const country = language.split("-")[1]; // "pt-BR" → "BR"
+    const country = language.split("-")[1];
 
     let data;
     if (mediaType === "movie") {
@@ -421,7 +451,7 @@ class TMDBService {
       data = await tmdbRepository.fetchClassificationTv(mediaId);
     }
 
-    // filtra pelo país
+
     const classification = data.results.find(
       (item: any) => item.iso_3166_1 === country
     );

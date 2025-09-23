@@ -1,3 +1,53 @@
+export function mapCertificationGenre(
+  pageType: "movie" | "tv",
+  movieGenreId: number,
+  region: string,
+): string {
+  const movieMap: Record<string, Record<number, string>> = {
+    US: {
+      10749: "PG-13", // Romance
+      18: "R",        // Drama
+      99: "PG",       // Documentário
+    },
+    BR: {
+      10749: "12",
+      18: "16",
+      99: "10",
+    },
+    ES: {
+      10749: "12",
+      18: "16",
+      99: "12",
+    },
+  };
+
+  const tvMap: Record<string, Record<number, string>> = {
+    US: {
+      10749: "TV-14", // Romance
+      18: "TV-MA",    // Drama
+      99: "TV-PG",    // Documentário
+    },
+    BR: {
+      10749: "12",
+      18: "16",
+      99: "10",
+    },
+    ES: {
+      10749: "12",
+      18: "16",
+      99: "12",
+    },
+  };
+
+  const mapping = pageType === "movie" ? movieMap[region] : tvMap[region];
+
+  return mapping?.[movieGenreId] ?? "";
+}
+
+
+
+
+
 export function mapMovieGenreToTvGenre(movieGenreId: number): number {
   const mapping: Record<number, number> = {
     28: 10759, // Action -> Action & Adventure
@@ -47,7 +97,7 @@ export function buildWithoutGenres(
         withoutArray = [35, 16, 99];
         break;
       case 18:
-        withoutArray = [878, 10770, 99, 10752, 36, 28];
+        withoutArray = [99, 10752];
         break;
       case 9648:
         withoutArray = [16, 27];
