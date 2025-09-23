@@ -15,5 +15,13 @@ router.get("/tmdb/images/logos", authenticateFirebase, (req, res) => tmdbControl
 router.get("/tmdb/images/posters", authenticateFirebase, (req, res) => tmdbController.getBackdropsImagesById(req, res));
 router.get("/tmdb/images/backdrops", authenticateFirebase, (req, res) => tmdbController.getBackdropsImagesById(req, res));
 router.get("/tmdb/video", authenticateFirebase, (req, res) => tmdbController.getVideoById(req, res));
+router.get("/tmdb/perGenres", authenticateFirebase, (req, res) => tmdbController.getPerGenres(req, res));
+
+
+router.get("/tmdb/search/multi", authenticateFirebase, (req, res) => tmdbController.getSearchMulti(req, res));
+router.get("/tmdb/search/person", authenticateFirebase, (req, res) => tmdbController.getSearchPerson(req, res));
+router.get("/tmdb/genres", authenticateFirebase, (req, res) => tmdbController.getGenres(req, res));
+router.get("/tmdb/classification", authenticateFirebase, (req, res) => tmdbController.getClassification(req, res));
+router.get("/tmdb/mediadetails", authenticateFirebase, (req, res) => tmdbController.getMediaDetails(req, res));
 
 export default router;

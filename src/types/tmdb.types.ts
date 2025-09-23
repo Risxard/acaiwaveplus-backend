@@ -2,14 +2,22 @@ export interface TMDBMedia {
   id: number;
   title?: string;
   name?: string;
-  overview: string;
-  poster_path: string | null;
-  backdrop_path: string | null;
+  original_title?: string;
+  original_name?: string;
+  media_type?: "movie" | "tv" | "person";
+  backdrop_path?: string | null;
+  poster_path?: string | null;
+  overview?: string;
   release_date?: string;
   first_air_date?: string;
-  vote_average: number;
-  popularity: number;
-  original_language: string;
+  genre_ids?: number[];
+  popularity?: number;
+  vote_average?: number;
+  vote_count?: number;
+  character?: string;
+  job?: string;
+  department?: string;
+  credit_id?: string;
 }
 
 export interface TMDBResponse<T> {
@@ -21,7 +29,10 @@ export interface TMDBResponse<T> {
 
 
 
-
+export interface TMDBCredits {
+  cast: TMDBMedia[];
+  crew: TMDBMedia[];
+}
 
 export interface ImagesInterface {
   aspect_ratio: number;
@@ -56,4 +67,33 @@ export interface VideosInterface {
 export interface VideosResponse<T> {
   results: VideosInterface[];
   id: number;
+}
+
+
+export interface TMDBPersonResponse {
+  adult: boolean;
+  also_known_as: string[];
+  biography: string;
+  birthday: string | null;
+  deathday: string | null;
+  gender: number;
+  homepage: string | null;
+  id: number;
+  imdb_id: string;
+  known_for_department: string;
+  name: string;
+  place_of_birth: string | null;
+  popularity: number;
+  profile_path: string | null;
+  movie_credits: TMDBCredits;
+  tv_credits: TMDBCredits;
+}
+
+export interface TMDBGenre {
+  id: number;
+  name: string;
+}
+
+export interface TMDBGenresResponse {
+  genres: TMDBGenre[];
 }

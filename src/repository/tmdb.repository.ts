@@ -1,6 +1,6 @@
 import axios from "axios";
 import { TMDB_CONFIG } from "../config/tmdb";
-import { ImagesInterface, ImagesResponse, TMDBMedia, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBGenresResponse, TMDBMedia, TMDBPersonResponse, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
 
 class TMDBRepository {
   async fetchTrending(
@@ -23,6 +23,35 @@ class TMDBRepository {
 
     return data;
   }
+
+  async fetchMediaDetails(
+    mediaType: "movie" | "tv",
+    mediaId: number,
+    append_to_response: string,
+    language: string
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}`;
+
+    const { data } = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        language,
+        append_to_response,
+      },
+    });
+
+    return {
+      page: 1,
+      results: [data],
+      total_pages: 1,
+      total_results: 1,
+    };
+  }
+
+
+
   async fetchRecommendations(
     mediaType: "movie" | "tv",
     mediaId: number,
@@ -70,6 +99,50 @@ class TMDBRepository {
     return data;
   }
 
+  async fetchPerGenres(
+    pageType: "movie" | "tv",
+    language: string,
+    with_genres: string,
+    without_genres: string,
+    include_adult: string,
+    certification: string,
+    sort_by: string,
+    region: string,
+    page: number = 1
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/discover/${pageType}?certification=${certification}&certification_country=${region}`;
+
+
+
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        language,
+        with_genres,
+        without_genres,
+        include_adult,
+        sort_by,
+        page,
+      },
+    });
+
+    return data;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
 
   async fetchImagesById(mediaId: number, mediaType: string, language: string, originalLanguage: string) {
 
@@ -95,7 +168,7 @@ class TMDBRepository {
   }
 
 
-  async getVideoById(mediaId: number, mediaType: string, language: string) {
+  async fetchVideoById(mediaId: number, mediaType: string, language: string) {
     const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/videos`;
 
     const { data } = await axios.get<VideosResponse<VideosInterface>>(url, {
@@ -109,6 +182,99 @@ class TMDBRepository {
 
     return data;
   }
+
+
+
+
+  async fetchSearchMulti(
+    query: string,
+    language: string,
+    page: number = 1,
+
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/search/multi`;
+
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        query,
+        language,
+        page,
+      },
+    });
+
+    return data;
+  }
+
+  async fetchSearchPerson(
+    person_id: number,
+    language: string,
+    append_to_response: string,
+  ): Promise<TMDBPersonResponse> {
+    const url = `${TMDB_CONFIG.baseUrl}/person/${person_id}`;
+
+    const { data } = await axios.get<TMDBPersonResponse>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: {
+        language,
+        append_to_response,
+      },
+    });
+
+    return data;
+  }
+
+  async fetchGenres(
+    pageType: "movie" | "tv",
+    language: string
+  ): Promise<TMDBGenresResponse> {
+    const url = `${TMDB_CONFIG.baseUrl}/genre/${pageType}/list`;
+
+    const { data } = await axios.get<TMDBGenresResponse>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      },
+      params: { language },
+    });
+
+    return data;
+  }
+
+
+  async fetchClassificationMovie(
+    mediaId: number,
+  ): Promise<TMDBGenresResponse> {
+    const url = `${TMDB_CONFIG.baseUrl}/movie/${mediaId}/release_dates`;
+
+    const { data } = await axios.get<TMDBGenresResponse>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      }
+    });
+
+    return data;
+  }
+  async fetchClassificationTv(
+    mediaId: number,
+  ): Promise<TMDBResponse<TMDBMedia>> {
+    const url = `${TMDB_CONFIG.baseUrl}/tv/${mediaId}/content_ratings`;
+
+    const { data } = await axios.get<TMDBResponse<TMDBMedia>>(url, {
+      headers: {
+        Authorization: `Bearer ${TMDB_CONFIG.apiKey}`,
+      }
+    });
+
+    return data;
+  }
+
+
+
 }
 
 export default new TMDBRepository();

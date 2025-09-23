@@ -1,7 +1,8 @@
 
 import tmdbRepository from "../repository/tmdb.repository";
-import { ImagesInterface, ImagesResponse, TMDBMedia, VideosInterface } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBGenre, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
+import { mapMovieGenreToTvGenre, buildWithoutGenres, mapCertificationGenre } from "../utils/functions";
 import videoFilter from "../utils/videoFilter";
 
 class TMDBService {
@@ -15,11 +16,41 @@ class TMDBService {
     }
 
     const data = await tmdbRepository.fetchTrending(timeWindow, pageType, language, page);
-    const movies = data.results.slice(0, 10);
+    const movies = data.results.slice(0, 20);
     cache.set(cacheKey, movies);
 
     return movies;
   }
+
+async getMediaDetail(
+  mediaType: "movie" | "tv",
+  mediaId: number,
+  language: string
+): Promise<TMDBMedia> {
+  const cacheKey = `mediadetail:${mediaType}:${mediaId}:${language}`;
+  const cached = cache.get<TMDBMedia>(cacheKey);
+
+  if (cached) {
+    return cached;
+  }
+
+  const append_to_response = "videos,similar,translations,credits";
+
+  const response = await tmdbRepository.fetchMediaDetails(
+    mediaType,
+    mediaId,
+    append_to_response,
+    language
+  );
+
+
+  const mediaDetail = response.results[0];
+
+  cache.set(cacheKey, mediaDetail);
+
+  return mediaDetail;
+}
+
 
 
   async getRecommendations(mediaType: "movie" | "tv", mediaId: number, language: string, page: number): Promise<TMDBMedia[]> {
@@ -45,7 +76,7 @@ class TMDBService {
       return cached;
     }
 
-   
+
 
 
     const data = await tmdbRepository.fetchNowPlaying(pageType, language, region, page);
@@ -56,13 +87,70 @@ class TMDBService {
   }
 
 
+
+  async getPerGenres(
+    pageType: "movie" | "tv",
+    language: string,
+    with_genres: string,
+    sort_by: string,
+    page: number = 1
+  ): Promise<TMDBMedia[]> {
+    const region = language.includes("-")
+      ? language.split("-")[1]
+      : language;
+
+
+    const cacheKey = `pergenres:${pageType}:${language}:${region}:${with_genres}:${sort_by}:${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const selectedGenre = Number(with_genres);
+
+
+    const certification = mapCertificationGenre(pageType, selectedGenre, region);
+
+
+
+    const adjustedGenre =
+      pageType === "tv" ? mapMovieGenreToTvGenre(selectedGenre) : selectedGenre;
+
+    const without_genres = buildWithoutGenres(pageType, adjustedGenre);
+    const include_adult = "false";
+
+    const data = await tmdbRepository.fetchPerGenres(
+      pageType,
+      language,
+      adjustedGenre.toString(),
+      without_genres,
+      include_adult,
+      certification,
+      sort_by,
+      region,
+      page
+    );
+
+    const medias = data.results.slice(0, 20);
+    cache.set(cacheKey, medias);
+
+    return medias;
+  }
+
+
+
+
+
+
+
   async getImagesById(
     mediaId: number,
     mediaType: string,
     language: string,
     originalLanguage: string
   ): Promise<ImagesResponse<ImagesInterface>> {
-    const cacheKey = `${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+    const cacheKey = `images:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
     const cached = cache.get<ImagesResponse<ImagesInterface>>(cacheKey);
 
     if (cached) {
@@ -265,20 +353,20 @@ class TMDBService {
       return cached;
     }
 
-    const data = await tmdbRepository.getVideoById(mediaId, mediaType, language);
+    const data = await tmdbRepository.fetchVideoById(mediaId, mediaType, language);
     const results = data.results;
 
     let resultado = await videoFilter(results, language, originalLanguage);
 
 
     if (resultado === null && originalLanguage !== "en-US") {
-      const dataFallback = await tmdbRepository.getVideoById(mediaId, mediaType, originalLanguage);
+      const dataFallback = await tmdbRepository.fetchVideoById(mediaId, mediaType, originalLanguage);
       const resultsFallback = dataFallback.results;
       resultado = await videoFilter(resultsFallback, originalLanguage, originalLanguage);
     }
 
     if (resultado === null && language !== "en-US" && originalLanguage !== "en-US") {
-      const dataEn = await tmdbRepository.getVideoById(mediaId, mediaType, "en-US");
+      const dataEn = await tmdbRepository.fetchVideoById(mediaId, mediaType, "en-US");
       const resultsEn = dataEn.results;
       resultado = await videoFilter(resultsEn, "en-US", originalLanguage);
     }
@@ -287,6 +375,108 @@ class TMDBService {
 
     return resultado;
   }
+
+
+  async getSearchMulti(
+    query: string,
+    language: string,
+    page: number = 1
+  ): Promise<TMDBMedia[]> {
+    const cacheKey = `searchmulti:${query}:${language}:${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+
+
+    const data = await tmdbRepository.fetchSearchMulti(
+      query,
+      language,
+      page
+    );
+
+    const medias = data.results;
+    cache.set(cacheKey, medias);
+
+    return medias;
+  }
+
+  async getSearchPerson(
+    person_id: number,
+    language: string,
+  ): Promise<TMDBPersonResponse> {
+    const cacheKey = `searchperson:${person_id}:${language}`;
+    const cached = cache.get<TMDBPersonResponse>(cacheKey);
+
+    if (cached) return cached;
+
+    const append_to_response = "movie_credits,tv_credits";
+
+    const data = await tmdbRepository.fetchSearchPerson(
+      person_id,
+      language,
+      append_to_response,
+    );
+
+    cache.set(cacheKey, data);
+
+    return data;
+  }
+
+  async getGenres(
+    pageType: "movie" | "tv",
+    language: string
+  ): Promise<TMDBGenre[]> {
+    const cacheKey = `genres:${pageType}:${language}`;
+    const cached = cache.get<TMDBGenre[]>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const data = await tmdbRepository.fetchGenres(pageType, language);
+    const genres = data.genres;
+    cache.set(cacheKey, genres);
+
+    return genres;
+  }
+
+  async getClassification(
+    mediaType: "movie" | "tv",
+    mediaId: number,
+    language: string
+  ): Promise<any> {
+    const cacheKey = `classification:${mediaType}${mediaId}:${language}`;
+    const cached = cache.get<any>(cacheKey);
+
+    if (cached) {
+      return cached;
+    }
+
+    const country = language.split("-")[1];
+
+    let data;
+    if (mediaType === "movie") {
+      data = await tmdbRepository.fetchClassificationMovie(mediaId);
+    } else {
+      data = await tmdbRepository.fetchClassificationTv(mediaId);
+    }
+
+
+    const classification = data.results.find(
+      (item: any) => item.iso_3166_1 === country
+    );
+
+    cache.set(cacheKey, classification);
+
+    return classification;
+  }
+
+
+
+
 }
 
 export default new TMDBService();

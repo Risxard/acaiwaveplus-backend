@@ -27,6 +27,30 @@ export default class TMDBController {
     }
   }
 
+  getMediaDetails = async (req: Request, res: Response) => {
+    try {
+      const { mediaType, mediaId, language } = req.query;
+
+
+      if (!mediaType || !mediaId || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaType, mediaId, language",
+        });
+      }
+
+      const data = await tmdbService.getMediaDetail(
+        mediaType as "movie" | "tv",
+        Number (mediaId),
+        language as string,
+      );
+
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar mediaDetails." });
+    }
+  }
+
   getRecommendations = async (req: Request, res: Response) => {
     try {
       const { mediaType, mediaId, language, page = 1 } = req.query;
@@ -76,6 +100,35 @@ export default class TMDBController {
       return res.status(500).json({ error: "Erro ao buscar nos cinemas." });
     }
   };
+
+  getPerGenres = async (req: Request, res: Response) => {
+    try {
+      const { pageType, language, with_genres, sort_by, page } = req.query;
+
+      if (!pageType || !language || !with_genres || !sort_by || !page) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: pageType, language, page e with_genres",
+        });
+      }
+
+      const data = await tmdbService.getPerGenres(
+        pageType as "movie" | "tv",
+        language as string,
+        with_genres as string,
+        sort_by as string,
+        Number(page),
+      );
+
+      return res.status(200).json(data);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar medias por genero." });
+    }
+  };
+
+
+
+
 
 
 
@@ -198,6 +251,96 @@ export default class TMDBController {
     } catch (error) {
       console.error("Erro no controller:", error);
       return res.status(500).json({ error: "Erro ao buscar video." });
+    }
+  };
+
+  getSearchMulti = async (req: Request, res: Response) => {
+    try {
+      const { query, language, page } = req.query;
+
+      if (!query || !language || !page) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: query, language e page",
+        });
+      }
+
+      const movies = await tmdbService.getSearchMulti(
+        query as string,
+        language as string,
+        Number(page),
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar SearchMulti." });
+    }
+  };
+
+  getSearchPerson = async (req: Request, res: Response) => {
+    try {
+      const { person_id, language } = req.query;
+
+      if (!person_id || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: person_id, language",
+        });
+      }
+
+      const movies = await tmdbService.getSearchPerson(
+        Number(person_id),
+        language as string,
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar Search Person." });
+    }
+  };
+
+  getGenres = async (req: Request, res: Response) => {
+    try {
+      const { pageType, language } = req.query;
+
+      if (!pageType || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: pageType e language",
+        });
+      }
+
+      const movies = await tmdbService.getGenres(
+        pageType as "movie" | "tv",
+        language as string,
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar genres no controller." });
+    }
+  };
+
+  getClassification = async (req: Request, res: Response) => {
+    try {
+      const { mediaType, mediaId, language } = req.query;
+
+      if (!mediaType || !mediaId || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaType, mediaId, language",
+        });
+      }
+
+      const movies = await tmdbService.getClassification(
+        mediaType as "movie" | "tv",
+        Number(mediaId),
+        language as string,
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar Classification no controller." });
     }
   };
 
