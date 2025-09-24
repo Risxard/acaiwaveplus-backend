@@ -3,11 +3,11 @@ version: '3.8'
 services:
   api:
     container_name: acaiwaveplus-api
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     env_file:
       - .env
+    volumes:
+      - ./firebase-admin-sdk.json:/app/firebase-admin-sdk.json:ro
     ports:
-      - "7475:7475" 
+      - "7475:7475"
     restart: always

@@ -1,4 +1,3 @@
-
 FROM node:18-alpine
 
 WORKDIR /app
@@ -7,10 +6,8 @@ COPY package*.json ./
 
 RUN npm install --production
 
-COPY dist ./dist
-
-COPY .env .env
+COPY . .
 
 EXPOSE 7475
 
-CMD ["node", "dist/server.js"]
+CMD ["npm", "run", "start"]
