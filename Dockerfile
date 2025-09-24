@@ -1,13 +1,18 @@
+
 FROM node:18-alpine
+
 
 WORKDIR /app
 
 COPY package*.json ./
-
-RUN npm install --production
+RUN npm install
 
 COPY . .
 
+
+RUN npm run build
+
 EXPOSE 7475
 
-CMD ["npm", "run", "start"]
+
+CMD ["node", "dist/server.js"]
