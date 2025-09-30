@@ -144,16 +144,21 @@ class TMDBRepository {
 
 
 
-  async fetchImagesById(mediaId: number, mediaType: string, language: string, originalLanguage: string) {
-
+  async fetchImagesById(
+    mediaId: number,
+    mediaType: string,
+    language: string,
+    originalLanguage: string
+  ) {
     const normalizedLanguage = language.includes("-")
       ? language.split("-")[0]
       : language;
 
-    const lang1Check = normalizedLanguage === 'en' ? '' : `${normalizedLanguage}%2C`;
-    const lang2Check = originalLanguage === 'en' ? '' : `${originalLanguage}%2C`;
+    const lang1Check = normalizedLanguage === "en" ? "" : `${normalizedLanguage}%2C`;
+    const lang2Check = originalLanguage === "en" ? "" : `${originalLanguage}%2C`;
 
-    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/images?include_image_language=${lang1Check + lang2Check}en`;
+ 
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/images?include_image_language=${lang1Check + lang2Check}en,null`;
 
     const { data } = await axios.get(url, {
       headers: {
@@ -166,6 +171,7 @@ class TMDBRepository {
 
     return data;
   }
+
 
 
   async fetchVideoById(mediaId: number, mediaType: string, language: string) {
@@ -182,8 +188,6 @@ class TMDBRepository {
 
     return data;
   }
-
-
 
 
   async fetchSearchMulti(

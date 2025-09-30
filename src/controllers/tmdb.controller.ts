@@ -40,7 +40,7 @@ export default class TMDBController {
 
       const data = await tmdbService.getMediaDetail(
         mediaType as "movie" | "tv",
-        Number (mediaId),
+        Number(mediaId),
         language as string,
       );
 
@@ -204,6 +204,31 @@ export default class TMDBController {
       return res.status(500).json({ error: "Erro ao buscar imagens." });
     }
   };
+
+  getPosterAndLogoById = async (req: Request, res: Response) => {
+    try {
+      const { mediaId, mediaType, language, originalLanguage } = req.query;
+
+      if (!mediaId || !mediaType || !language || !originalLanguage) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: mediaId, mediaType, language e originalLanguage",
+        });
+      }
+
+      const result = await tmdbService.getPosterAndLogoById(
+        Number(mediaId),
+        mediaType as "movie" | "tv",
+        language as string,
+        originalLanguage as string
+      );
+
+      return res.status(200).json(result);
+    } catch (error) {
+      console.error("Erro no controller getPosterAndLogoById:", error);
+      return res.status(500).json({ error: "Erro ao buscar poster e logo." });
+    }
+  };
+
 
 
   getBackdropsImagesById = async (req: Request, res: Response) => {
