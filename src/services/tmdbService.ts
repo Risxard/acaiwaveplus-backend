@@ -194,7 +194,7 @@ class TMDBService {
     // 1. Pega primeiro os que têm iso null
     posters = data.posters.filter((p) => p.iso_639_1 === null);
 
-    console.log(posters)
+
 
     // 2. Se não achar, pega no idioma normalizado
     if (posters.length === 0) {
@@ -229,69 +229,7 @@ class TMDBService {
     return poster || null;
   }
 
-  async getLogoAndPosterImagesById(
-    mediaId: number,
-    mediaType: string,
-    language: string,
-    originalLanguage: string
-  ): Promise<ImagesInterface | null> {
-    const cacheKey = `posters:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
-    const cached = cache.get<ImagesInterface | null>(cacheKey);
 
-    if (cached) {
-      return cached;
-    }
-
-    const data = await tmdbRepository.fetchImagesById(
-      mediaId,
-      mediaType,
-      language,
-      originalLanguage
-    );
-
-    const normalizedLanguage = language.includes("-")
-      ? language.split("-")[0]
-      : language;
-
-    let posters: ImagesInterface[] = [];
-
-    // 1. Pega primeiro os que têm iso null
-    posters = data.posters.filter((p) => p.iso_639_1 === null);
-
-    console.log(posters)
-
-    // 2. Se não achar, pega no idioma normalizado
-    if (posters.length === 0) {
-      posters = data.posters.filter((p) => p.iso_639_1 === normalizedLanguage);
-    }
-
-    // 3. Se não achar, pega em inglês
-    if (posters.length === 0) {
-      posters = data.posters.filter((p) => p.iso_639_1 === "en");
-    }
-
-    // 4. Se não achar, pega no idioma original
-    if (posters.length === 0 && originalLanguage) {
-      posters = data.posters.filter((p) => p.iso_639_1 === originalLanguage);
-    }
-
-    // 5. Se mesmo assim não achar, pega qualquer um
-    if (posters.length === 0 && data.posters.length > 0) {
-      posters = data.posters;
-    }
-
-    // Escolhe o de maior vote_average
-    let poster: ImagesInterface | null = null;
-    if (posters.length > 0) {
-      poster = posters.reduce((prev, curr) =>
-        (curr.vote_average ?? 0) > (prev.vote_average ?? 0) ? curr : prev
-      );
-    }
-
-    cache.set(cacheKey, poster || null);
-
-    return poster || null;
-  }
 
 
 
@@ -380,15 +318,13 @@ class TMDBService {
     );
 
 
-
     const normalizedLanguage = language.includes("-")
       ? language.split("-")[0]
       : language;
 
 
     let posters: ImagesInterface[] = [];
-
-    posters = data.posters.filter((p) => p.iso_639_1 === null);
+    posters = data.posters.filter((p) => p.iso_639_1 === null || p.iso_639_1 === 'xx');
 
     if (posters.length === 0) {
       posters = data.posters.filter((p) => p.iso_639_1 === normalizedLanguage);
