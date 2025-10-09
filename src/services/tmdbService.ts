@@ -3,6 +3,7 @@ import tmdbRepository from "../repository/tmdb.repository";
 import { ImagesInterface, ImagesResponse, TMDBGenre, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
 import { mapMovieGenreToTvGenre, buildWithoutGenres, mapCertificationGenre } from "../utils/functions";
+import { selectBestImage } from "../utils/imageSelector.ts";
 import videoFilter from "../utils/videoFilter";
 
 class TMDBService {
@@ -295,150 +296,59 @@ class TMDBService {
     return backdrop || null;
   }
 
-  async getPosterAndLogoById(
-    mediaId: number,
-    mediaType: string,
-    language: string,
-    originalLanguage: string
-  ): Promise<{ poster: ImagesInterface | null; logo: ImagesInterface | null }> {
-    const cacheKey = `poster_logo:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
-    const cached = cache.get<{ poster: ImagesInterface | null; logo: ImagesInterface | null }>(cacheKey);
+async getPosterAndLogoById(
+  mediaId: number,
+  mediaType: string,
+  language: string,
+  originalLanguage: string
+): Promise<{ poster: ImagesInterface | null; logo: ImagesInterface | null }> {
+  const cacheKey = `poster_logo:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+  const cached = cache.get<{ poster: ImagesInterface | null; logo: ImagesInterface | null }>(cacheKey);
+  if (cached) return cached;
 
+  const data = await tmdbRepository.fetchImagesById(
+    mediaId,
+    mediaType,
+    language,
+    originalLanguage
+  );
 
+  const poster = selectBestImage(data.posters, language, originalLanguage, "poster");
+  const logo = selectBestImage(data.logos, language, originalLanguage, "logo");
 
-    if (cached) {
-      return cached;
-    }
+  const result = { poster, logo };
+  cache.set(cacheKey, result);
 
-    const data = await tmdbRepository.fetchImagesById(
-      mediaId,
-      mediaType,
-      language,
-      originalLanguage
-    );
-
-
-    const normalizedLanguage = language.includes("-")
-      ? language.split("-")[0]
-      : language;
-
-
-    let posters: ImagesInterface[] = [];
-    posters = data.posters.filter((p) => p.iso_639_1 === null || p.iso_639_1 === 'xx');
-
-    if (posters.length === 0) {
-      posters = data.posters.filter((p) => p.iso_639_1 === normalizedLanguage);
-    }
-
-    if (posters.length === 0) {
-      posters = data.posters.filter((p) => p.iso_639_1 === "en");
-    }
-
-    if (posters.length === 0 && originalLanguage) {
-      posters = data.posters.filter((p) => p.iso_639_1 === originalLanguage);
-    }
-
-    if (posters.length === 0 && data.posters.length > 0) {
-      posters = data.posters;
-    }
-
-    let poster: ImagesInterface | null = null;
-    if (posters.length > 0) {
-      poster = posters.reduce((prev, curr) =>
-        (curr.vote_average ?? 0) > (prev.vote_average ?? 0) ? curr : prev
-      );
-    }
-
-
-    let logos: ImagesInterface[] = [];
-
-    logos = data.logos.filter((l) => l.iso_639_1 === normalizedLanguage);
-
-    if (logos.length === 0) {
-      logos = data.logos.filter((l) => l.iso_639_1 === "en");
-    }
-
-    if (logos.length === 0 && originalLanguage) {
-      logos = data.logos.filter((l) => l.iso_639_1 === originalLanguage);
-    }
-
-    if (logos.length === 0 && data.logos.length > 0) {
-      logos = data.logos;
-    }
-
-    let logo: ImagesInterface | null = null;
-    if (logos.length > 0) {
-      logo = logos.reduce((prev, curr) =>
-        (curr.vote_average ?? 0) > (prev.vote_average ?? 0) ? curr : prev
-      );
-    }
-
-
-    const result = { poster, logo };
-    cache.set(cacheKey, result);
-
-    return result;
-  }
+  return result;
+}
 
 
 
 
 
-  async getLogoImagesById(
-    mediaId: number,
-    mediaType: string,
-    language: string,
-    originalLanguage: string
-  ): Promise<ImagesInterface | null> {
-    const cacheKey = `logos:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
-    const cached = cache.get<ImagesInterface | null>(cacheKey);
 
-    if (cached) {
-      return cached;
-    }
+async getLogoImagesById(
+  mediaId: number,
+  mediaType: string,
+  language: string,
+  originalLanguage: string
+): Promise<ImagesInterface | null> {
+  const cacheKey = `logos:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+  const cached = cache.get<ImagesInterface | null>(cacheKey);
+  if (cached) return cached;
 
-    const data = await tmdbRepository.fetchImagesById(
-      mediaId,
-      mediaType,
-      language,
-      originalLanguage
-    );
+  const data = await tmdbRepository.fetchImagesById(
+    mediaId,
+    mediaType,
+    language,
+    originalLanguage
+  );
 
-    const normalizedLanguage = language.includes("-")
-      ? language.split("-")[0]
-      : language;
+  const logo = selectBestImage(data.logos, language, originalLanguage, "logo");
+  cache.set(cacheKey, logo || null);
 
-    let logos = data.logos.filter(
-      (l: ImagesInterface) => l.iso_639_1 === normalizedLanguage
-    );
-
-    if (logos.length === 0) {
-      logos = data.logos.filter(
-        (l: ImagesInterface) => l.iso_639_1 === "en"
-      );
-    }
-
-    if (logos.length === 0 && originalLanguage) {
-      logos = data.logos.filter(
-        (l: ImagesInterface) => l.iso_639_1 === originalLanguage
-      );
-    }
-
-    if (logos.length === 0 && data.logos.length > 0) {
-      logos = data.logos;
-    }
-
-    let logo: ImagesInterface | null = null;
-    if (logos.length > 0) {
-      logo = logos.reduce((prev: { vote_average: any; }, curr: { vote_average: any; }) =>
-        (curr.vote_average ?? 0) > (prev.vote_average ?? 0) ? curr : prev
-      );
-    }
-
-    cache.set(cacheKey, logo || null);
-
-    return logo || null;
-  }
+  return logo || null;
+}
 
 
 
