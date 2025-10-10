@@ -19,6 +19,10 @@ router.get("/tmdb/video", authenticateFirebase, (req, res) => tmdbController.get
 router.get("/tmdb/perGenres", authenticateFirebase, (req, res) => tmdbController.getPerGenres(req, res));
 
 
+
+router.get("/tmdb/season", authenticateFirebase, (req, res) => tmdbController.getSeason(req, res));
+
+
 router.get("/tmdb/search/multi", authenticateFirebase, (req, res) => tmdbController.getSearchMulti(req, res));
 router.get("/tmdb/search/person", authenticateFirebase, (req, res) => tmdbController.getSearchPerson(req, res));
 router.get("/tmdb/genres", authenticateFirebase, (req, res) => tmdbController.getGenres(req, res));

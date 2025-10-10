@@ -296,59 +296,59 @@ class TMDBService {
     return backdrop || null;
   }
 
-async getPosterAndLogoById(
-  mediaId: number,
-  mediaType: string,
-  language: string,
-  originalLanguage: string
-): Promise<{ poster: ImagesInterface | null; logo: ImagesInterface | null }> {
-  const cacheKey = `poster_logo:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
-  const cached = cache.get<{ poster: ImagesInterface | null; logo: ImagesInterface | null }>(cacheKey);
-  if (cached) return cached;
+  async getPosterAndLogoById(
+    mediaId: number,
+    mediaType: string,
+    language: string,
+    originalLanguage: string
+  ): Promise<{ poster: ImagesInterface | null; logo: ImagesInterface | null }> {
+    const cacheKey = `poster_logo:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+    const cached = cache.get<{ poster: ImagesInterface | null; logo: ImagesInterface | null }>(cacheKey);
+    if (cached) return cached;
 
-  const data = await tmdbRepository.fetchImagesById(
-    mediaId,
-    mediaType,
-    language,
-    originalLanguage
-  );
+    const data = await tmdbRepository.fetchImagesById(
+      mediaId,
+      mediaType,
+      language,
+      originalLanguage
+    );
 
-  const poster = selectBestImage(data.posters, language, originalLanguage, "poster");
-  const logo = selectBestImage(data.logos, language, originalLanguage, "logo");
+    const poster = selectBestImage(data.posters, language, originalLanguage, "poster");
+    const logo = selectBestImage(data.logos, language, originalLanguage, "logo");
 
-  const result = { poster, logo };
-  cache.set(cacheKey, result);
+    const result = { poster, logo };
+    cache.set(cacheKey, result);
 
-  return result;
-}
-
-
+    return result;
+  }
 
 
 
 
-async getLogoImagesById(
-  mediaId: number,
-  mediaType: string,
-  language: string,
-  originalLanguage: string
-): Promise<ImagesInterface | null> {
-  const cacheKey = `logos:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
-  const cached = cache.get<ImagesInterface | null>(cacheKey);
-  if (cached) return cached;
 
-  const data = await tmdbRepository.fetchImagesById(
-    mediaId,
-    mediaType,
-    language,
-    originalLanguage
-  );
 
-  const logo = selectBestImage(data.logos, language, originalLanguage, "logo");
-  cache.set(cacheKey, logo || null);
+  async getLogoImagesById(
+    mediaId: number,
+    mediaType: string,
+    language: string,
+    originalLanguage: string
+  ): Promise<ImagesInterface | null> {
+    const cacheKey = `logos:${mediaType}:${mediaId}:${language}:${originalLanguage}`;
+    const cached = cache.get<ImagesInterface | null>(cacheKey);
+    if (cached) return cached;
 
-  return logo || null;
-}
+    const data = await tmdbRepository.fetchImagesById(
+      mediaId,
+      mediaType,
+      language,
+      originalLanguage
+    );
+
+    const logo = selectBestImage(data.logos, language, originalLanguage, "logo");
+    cache.set(cacheKey, logo || null);
+
+    return logo || null;
+  }
 
 
 
@@ -487,8 +487,29 @@ async getLogoImagesById(
     return classification;
   }
 
+  async getSeason(tvId: number, seasonNumber: number, language: string) {
+    const cacheKey = `season:${tvId}:${seasonNumber}:${language}`;
+    const cached = cache.get(cacheKey);
+    if (cached) return cached;
 
+    const seasonData = await tmdbRepository.fetchSeason(tvId, seasonNumber, language);
 
+    const filtered = {
+      name: seasonData.name,
+      season_number: seasonData.season_number,
+      episodes: seasonData.episodes
+        .map((ep) => ({
+          still_path: ep.still_path,
+          runtime: ep.runtime,
+          overview: ep.overview,
+          name: ep.name,
+          episode_number: ep.episode_number,
+        })),
+    };
+
+    cache.set(cacheKey, filtered);
+    return filtered;
+  }
 
 }
 
