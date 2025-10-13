@@ -369,5 +369,30 @@ export default class TMDBController {
     }
   };
 
+
+  getSeason = async (req: Request, res: Response) => {
+    try {
+      const { tvId, seasonNumber, language } = req.query;
+
+      if (!tvId || !seasonNumber || !language) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: tvId, seasonNumber, language",
+        });
+      }
+
+      const season = await tmdbService.getSeason(
+        Number(tvId),
+        Number(seasonNumber),
+        language as string,
+      );
+
+      return res.status(200).json(season);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar temporada." });
+    }
+  };
+
+
 }
 

@@ -133,17 +133,6 @@ class TMDBRepository {
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
   async fetchImagesById(
     mediaId: number,
     mediaType: string,
@@ -157,8 +146,10 @@ class TMDBRepository {
     const lang1Check = normalizedLanguage === "en" ? "" : `${normalizedLanguage}%2C`;
     const lang2Check = originalLanguage === "en" ? "" : `${originalLanguage}%2C`;
 
- 
-    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/images?include_image_language=${lang1Check + lang2Check}en,null`;
+
+    const url = `${TMDB_CONFIG.baseUrl}/${mediaType}/${mediaId}/images?include_image_language=${lang1Check + lang2Check}%2Cen%2Cxx`;
+
+
 
     const { data } = await axios.get(url, {
       headers: {
@@ -171,7 +162,6 @@ class TMDBRepository {
 
     return data;
   }
-
 
 
   async fetchVideoById(mediaId: number, mediaType: string, language: string) {
@@ -278,6 +268,15 @@ class TMDBRepository {
   }
 
 
+  async fetchSeason(tvId: number, seasonNumber: number, language: string) {
+    const url = `${TMDB_CONFIG.baseUrl}/tv/${tvId}/season/${seasonNumber}`;
+    const { data } = await axios.get(url, {
+      headers: { Authorization: `Bearer ${TMDB_CONFIG.apiKey}` },
+      params: { language },
+    });
+
+    return data;
+  }
 
 }
 

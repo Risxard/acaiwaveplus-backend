@@ -38,6 +38,7 @@ export interface ImagesInterface {
   aspect_ratio: number;
   height: number;
   iso_639_1: string | null;
+  iso_3166_1: string | null;
   file_path: string;
   vote_average: number;
   vote_count: number;
