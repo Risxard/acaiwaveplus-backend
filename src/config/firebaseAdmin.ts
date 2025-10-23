@@ -9,9 +9,11 @@ if (!fs.existsSync(serviceAccountPath)) {
   throw new Error(`Arquivo de credenciais não encontrado em: ${serviceAccountPath}`);
 }
 
+const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf-8'));
+
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccountPath),
+    credential: admin.credential.cert(serviceAccount),
   });
 }
 

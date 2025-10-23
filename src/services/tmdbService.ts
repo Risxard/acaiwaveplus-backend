@@ -192,32 +192,26 @@ class TMDBService {
 
     let posters: ImagesInterface[] = [];
 
-    // 1. Pega primeiro os que têm iso null
     posters = data.posters.filter((p) => p.iso_639_1 === null);
 
 
 
-    // 2. Se não achar, pega no idioma normalizado
     if (posters.length === 0) {
       posters = data.posters.filter((p) => p.iso_639_1 === normalizedLanguage);
     }
 
-    // 3. Se não achar, pega em inglês
     if (posters.length === 0) {
       posters = data.posters.filter((p) => p.iso_639_1 === "en");
     }
 
-    // 4. Se não achar, pega no idioma original
     if (posters.length === 0 && originalLanguage) {
       posters = data.posters.filter((p) => p.iso_639_1 === originalLanguage);
     }
 
-    // 5. Se mesmo assim não achar, pega qualquer um
     if (posters.length === 0 && data.posters.length > 0) {
       posters = data.posters;
     }
 
-    // Escolhe o de maior vote_average
     let poster: ImagesInterface | null = null;
     if (posters.length > 0) {
       poster = posters.reduce((prev, curr) =>
