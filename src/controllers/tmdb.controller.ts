@@ -394,5 +394,30 @@ export default class TMDBController {
   };
 
 
+  getList = async (req: Request, res: Response) => {
+    try {
+      const { list_id, language, page = 1 } = req.query;
+
+
+      if (!list_id || !language || !page) {
+        return res.status(400).json({
+          error: "Parâmetros obrigatórios: list_id, language e page",
+        });
+      }
+
+      const movies = await tmdbService.getList(
+        Number(list_id),
+        language as string,
+        page as number,
+      );
+
+      return res.status(200).json(movies);
+    } catch (error) {
+      console.error("Erro no controller:", error);
+      return res.status(500).json({ error: "Erro ao buscar lista." });
+    }
+  }
+
+
 }
 

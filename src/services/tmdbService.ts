@@ -1,6 +1,6 @@
 
 import tmdbRepository from "../repository/tmdb.repository";
-import { ImagesInterface, ImagesResponse, TMDBGenre, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBGenre, TMDBListResponse, TMDBMedia, TMDBPersonResponse, VideosInterface } from "../types/tmdb.types";
 import cache from "../utils/cache";
 import { mapMovieGenreToTvGenre, buildWithoutGenres, mapCertificationGenre } from "../utils/functions";
 import { selectBestImage } from "../utils/imageSelector.ts";
@@ -504,6 +504,27 @@ class TMDBService {
     cache.set(cacheKey, filtered);
     return filtered;
   }
+
+
+  async getList(
+    list_id: number,
+    language: string,
+    page: number,
+  ): Promise<TMDBMedia[]> {
+    const cacheKey = `list:${list_id}:${language}:${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+    if (cached) return cached;
+
+    const list = await tmdbRepository.fetchList(list_id, language, page);
+
+    const data = list.items || [];
+    cache.set(cacheKey, data, 60 * 5);
+
+    return data;
+  }
+
+
+
 
 }
 
