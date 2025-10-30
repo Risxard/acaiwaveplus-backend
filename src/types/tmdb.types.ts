@@ -38,7 +38,16 @@ export interface TMDBListResponse {
   name: string;
   poster_path: string | null;
 }
-
+export interface TMDBCollectionResponse {
+  id: number;
+  name: string;
+  original_language: string;
+  original_name: string;
+  overview: string;
+  poster_path: string;
+  backdrop_path: string;
+  parts: TMDBMedia[];
+}
 
 
 export interface TMDBCredits {

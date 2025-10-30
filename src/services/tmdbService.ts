@@ -523,6 +523,23 @@ class TMDBService {
     return data;
   }
 
+  async getCollection(
+    collection_id: number,
+    language: string,
+    page: number,
+  ): Promise<TMDBMedia[]> {
+    const cacheKey = `collection:${collection_id}:${language}:${page}`;
+    const cached = cache.get<TMDBMedia[]>(cacheKey);
+    if (cached) return cached;
+
+    const list = await tmdbRepository.fetchCollection(collection_id, language, page);
+
+    const data = list.parts || [];
+    cache.set(cacheKey, data, 60 * 5);
+
+    return data;
+  }
+
 
 
 

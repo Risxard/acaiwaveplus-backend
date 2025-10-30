@@ -1,6 +1,6 @@
 import axios from "axios";
 import { TMDB_CONFIG } from "../config/tmdb";
-import { ImagesInterface, ImagesResponse, TMDBGenresResponse, TMDBListResponse, TMDBMedia, TMDBPersonResponse, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
+import { ImagesInterface, ImagesResponse, TMDBCollectionResponse, TMDBGenresResponse, TMDBListResponse, TMDBMedia, TMDBPersonResponse, TMDBResponse, VideosInterface, VideosResponse } from "../types/tmdb.types";
 
 class TMDBRepository {
   async fetchTrending(
@@ -289,6 +289,22 @@ class TMDBRepository {
       headers: { Authorization: `Bearer ${TMDB_CONFIG.apiKey}` },
       params: { language, page },
     });
+
+    return data;
+  }
+
+  async fetchCollection(
+    collection_id: number,
+    language: string,
+    page: number = 1
+  ): Promise<TMDBCollectionResponse> {
+    const url = `${TMDB_CONFIG.baseUrl}/collection/${collection_id}`;
+
+    const { data } = await axios.get<TMDBCollectionResponse>(url, {
+      headers: { Authorization: `Bearer ${TMDB_CONFIG.apiKey}` },
+      params: { language, page },
+    });
+
 
     return data;
   }
