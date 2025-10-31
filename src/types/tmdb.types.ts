@@ -27,6 +27,27 @@ export interface TMDBResponse<T> {
   total_results: number;
 }
 
+export interface TMDBListResponse {
+  created_by: string;
+  description: string;
+  favorite_count: number;
+  id: string;
+  items: TMDBMedia[];
+  item_count: number;
+  iso_639_1: string;
+  name: string;
+  poster_path: string | null;
+}
+export interface TMDBCollectionResponse {
+  id: number;
+  name: string;
+  original_language: string;
+  original_name: string;
+  overview: string;
+  poster_path: string;
+  backdrop_path: string;
+  parts: TMDBMedia[];
+}
 
 
 export interface TMDBCredits {
